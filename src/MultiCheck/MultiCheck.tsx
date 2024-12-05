@@ -13,6 +13,7 @@ export type Option = {
 export function makeOptionChunks(options: Option[], columns: number): Option[][] {
   const chunks: Option[][] = []
 
+  // determine chunk size
   options.forEach((opt, index) => {
     const chunkIndex = index % columns;
     if (!chunks[chunkIndex]) {
@@ -21,7 +22,16 @@ export function makeOptionChunks(options: Option[], columns: number): Option[][]
     chunks[chunkIndex].push(opt);
   });
 
-  return chunks
+  // reorder chunk items follow requirement
+  let start: number = 0;
+  let end: number = chunks?.[0]?.length;
+  return chunks.map((chunk, chunkIndex) => {
+    if (chunkIndex !== 0) {
+      start = end
+      end += chunk?.length
+    }
+    return options.slice(start, end)
+  })
 }
 
 /**
