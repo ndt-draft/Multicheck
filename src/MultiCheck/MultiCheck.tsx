@@ -1,6 +1,6 @@
 import './MultiCheck.css';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {FC} from 'react';
 import lodash from 'lodash'
 import Checkbox from './Checkbox';
@@ -41,16 +41,30 @@ export const MultiCheck: FC<Props> = (props: Props) => {
   console.log('props', props)
   const {options, values, onChange} = props
 
+  // handle it own selected values state
+  // caused by requirement **Don't modify the code of the 'Controller'**
+  const [selectedValues, setSelectedValues] = useState(values)
+
+  // reset selected values when Values count is modified by controller
+  useEffect(() => {
+    setSelectedValues(values)
+    if (typeof onChange === 'function') {
+      const checkedOptions = lodash.filter(options, opt => lodash.includes(values, opt.value))
+      onChange(checkedOptions)
+    }
+  }, [values])
+
   function handleChange(option: Option): (e: React.ChangeEvent<HTMLInputElement>) => void {
     return (e: React.ChangeEvent<HTMLInputElement>): void => {
       if (typeof onChange === 'function') {
-        let checkedOptions = lodash.filter(options, opt => lodash.includes(values, opt.value))
-        
+        let checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
+
         if (e.target.checked) {
           checkedOptions = [...checkedOptions, option]
         } else {
           checkedOptions = lodash.filter(checkedOptions, opt => opt.value !== option.value)
         }
+        setSelectedValues(lodash.map(checkedOptions, 'value'))
         onChange(checkedOptions)
       }
     }
@@ -61,7 +75,7 @@ export const MultiCheck: FC<Props> = (props: Props) => {
       <Checkbox
         key={option.value}
         option={option}
-        checked={lodash.includes(values, option.value)}
+        checked={lodash.includes(selectedValues, option.value)}
         onChange={handleChange(option)}
       />
     )}
