@@ -54,6 +54,15 @@ export const MultiCheck: FC<Props> = (props: Props) => {
     }
   }, [values])
 
+   // reset selected values when Options count is modified by controller
+   useEffect(() => {
+    if (typeof onChange === 'function') {
+      const checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
+      setSelectedValues(lodash.map(checkedOptions, 'value'))
+      onChange(checkedOptions)
+    }
+  }, [options])
+
   function handleChange(option: Option): (e: React.ChangeEvent<HTMLInputElement>) => void {
     return (e: React.ChangeEvent<HTMLInputElement>): void => {
       if (typeof onChange === 'function') {
