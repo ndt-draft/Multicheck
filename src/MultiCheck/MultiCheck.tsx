@@ -35,8 +35,15 @@ type Props = {
   onChange?: (options: Option[]) => void,
 }
 
-export const MultiCheck: FC<Props> = (props) => {
+export const MultiCheck: FC<Props> = (props: Props) => {
+  console.log('props', props)
+  const {options, onChange} = props
+
   return <div className='MultiCheck'>
-    TODO
+    {options.map(option =>
+      <label key={option.value}>
+        <input type="checkbox" value={option.value} />{option.label}
+      </label>
+    )}
   </div>
 }
