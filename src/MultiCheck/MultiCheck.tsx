@@ -2,6 +2,8 @@ import './MultiCheck.css';
 
 import React from 'react';
 import {FC} from 'react';
+import lodash from 'lodash'
+import Checkbox from './Checkbox';
 
 export type Option = {
   label: string,
@@ -37,13 +39,16 @@ type Props = {
 
 export const MultiCheck: FC<Props> = (props: Props) => {
   console.log('props', props)
-  const {options, onChange} = props
+  const {options, values, onChange} = props
 
   return <div className='MultiCheck'>
     {options.map(option =>
-      <label key={option.value}>
-        <input type="checkbox" value={option.value} />{option.label}
-      </label>
+      <Checkbox
+        key={option.value}
+        option={option}
+        checked={lodash.includes(values, option.value)}
+        onChange={lodash.noop}
+      />
     )}
   </div>
 }
