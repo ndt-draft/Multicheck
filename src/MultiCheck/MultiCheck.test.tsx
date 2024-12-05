@@ -1,4 +1,5 @@
 // TODO more tests
+import { makeOptionChunks, Option } from "./MultiCheck";
 
 describe('MultiCheck', () => {
   describe('initialize', () => {
@@ -6,4 +7,23 @@ describe('MultiCheck', () => {
       // TODO
     });
   });
+
+  describe('makeOptionChunks()', () => {
+    const sixOptions: Option[] = [
+      {label: 'aaa', value: '111',},
+      {label: 'bbb', value: '222',},
+      {label: 'ccc', value: '333',},
+      {label: 'ddd', value: '444',},
+      {label: 'eee', value: '555',},
+      {label: 'fff', value: '666',},
+    ]
+
+    it('should return even chunks as columns', () => {
+      expect(makeOptionChunks(sixOptions, 3)).toStrictEqual([
+        [{label: 'aaa', value: '111',}, {label: 'bbb', value: '222',}],
+        [{label: 'ccc', value: '333',}, {label: 'ddd', value: '444',}],
+        [{label: 'eee', value: '555',}, {label: 'fff', value: '666',}],
+      ])
+    })
+  })
 });
