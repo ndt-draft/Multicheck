@@ -63,7 +63,7 @@ type Props = {
 
 export const MultiCheck: FC<Props> = (props: Props) => {
   console.log('props', props)
-  const {options, values, columns, onChange} = props
+  const {label, options, values, columns, onChange} = props
 
   // handle it own selected values state
   // caused by requirement **Don't modify the code of the 'Controller'**
@@ -111,28 +111,31 @@ export const MultiCheck: FC<Props> = (props: Props) => {
   }
 
   return <div className='MultiCheck'>
-    {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) =>
-      <div key={chunkIndex} className="MultiCheck-column">
-        {chunk.map((option, optionIndex) =>
-          <>
-            {chunkIndex === 0 && optionIndex === 0 &&
-              <Checkbox option={{
-                  label: 'Select All',
-                  value: 'all'
-                }}
-                checked={options.length === selectedValues?.length}
-                onChange={handleSelectAll}
+    <span>{label}</span>
+    <div className="MultiCheck-options">
+      {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) =>
+        <div key={chunkIndex} className="MultiCheck-column">
+          {chunk.map((option, optionIndex) =>
+            <>
+              {chunkIndex === 0 && optionIndex === 0 &&
+                <Checkbox option={{
+                    label: 'Select All',
+                    value: 'all'
+                  }}
+                  checked={options.length === selectedValues?.length}
+                  onChange={handleSelectAll}
+                />
+              }
+              <Checkbox
+                key={option.value}
+                option={option}
+                checked={lodash.includes(selectedValues, option.value)}
+                onChange={handleChange(option)}
               />
-            }
-            <Checkbox
-              key={option.value}
-              option={option}
-              checked={lodash.includes(selectedValues, option.value)}
-              onChange={handleChange(option)}
-            />
-          </>
-        )}
-      </div>
-    )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
   </div>
 }

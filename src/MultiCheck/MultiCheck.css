@@ -1,6 +1,8 @@
 /* TODO */
 .MultiCheck {
-  display: flex;
+  .MultiCheck-options {
+    display: flex;
+  }
 
   label {
     display: block;
