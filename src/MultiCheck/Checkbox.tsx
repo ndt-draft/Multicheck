@@ -14,7 +14,7 @@ const Checkbox: FC<Props> = (props: Props) => {
   const {option, checked, onChange} = props
   return (
     <label>
-      <input type="checkbox" value={option.value} checked={checked} onChange={onChange} />{option.label}
+      <input type="checkbox" role="checkbox" value={option.value} checked={checked} onChange={onChange} />{option.label}
     </label>
   )
 }

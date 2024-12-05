@@ -2,7 +2,7 @@
 
 module.exports = {
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'jest-environment-jsdom',
   globals: {
     'ts-jest': {
       // ts-jest configuration goes here
@@ -10,5 +10,6 @@ module.exports = {
   },
   moduleNameMapper: {
     "\\.(css)$": "<rootDir>/__mocks__/styleMock.js",
-  }
+  },
+  setupFilesAfterEnv: ['<rootDir>/jest-setup.ts']
 };

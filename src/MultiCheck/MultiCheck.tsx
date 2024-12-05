@@ -62,7 +62,6 @@ type Props = {
 }
 
 export const MultiCheck: FC<Props> = (props: Props) => {
-  console.log('props', props)
   const {label, options, values, columns, onChange} = props
 
   // handle it own selected values state
@@ -111,10 +110,10 @@ export const MultiCheck: FC<Props> = (props: Props) => {
   }
 
   return <div className='MultiCheck'>
-    <span>{label}</span>
+    <span role="heading">{label}</span>
     <div className="MultiCheck-options">
       {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) =>
-        <div key={chunkIndex} className="MultiCheck-column">
+        <div key={chunkIndex} role="list" className="MultiCheck-column">
           {chunk.map((option, optionIndex) =>
             <React.Fragment key={optionIndex}>
               {chunkIndex === 0 && optionIndex === 0 &&
