@@ -41,13 +41,28 @@ export const MultiCheck: FC<Props> = (props: Props) => {
   console.log('props', props)
   const {options, values, onChange} = props
 
+  function handleChange(option: Option): (e: React.ChangeEvent<HTMLInputElement>) => void {
+    return (e: React.ChangeEvent<HTMLInputElement>): void => {
+      if (typeof onChange === 'function') {
+        let checkedOptions = lodash.filter(options, opt => lodash.includes(values, opt.value))
+        
+        if (e.target.checked) {
+          checkedOptions = [...checkedOptions, option]
+        } else {
+          checkedOptions = lodash.filter(checkedOptions, opt => opt.value !== option.value)
+        }
+        onChange(checkedOptions)
+      }
+    }
+  }
+
   return <div className='MultiCheck'>
     {options.map(option =>
       <Checkbox
         key={option.value}
         option={option}
         checked={lodash.includes(values, option.value)}
-        onChange={lodash.noop}
+        onChange={handleChange(option)}
       />
     )}
   </div>
