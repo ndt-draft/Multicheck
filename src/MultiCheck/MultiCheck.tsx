@@ -116,9 +116,10 @@ export const MultiCheck: FC<Props> = (props: Props) => {
       {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) =>
         <div key={chunkIndex} className="MultiCheck-column">
           {chunk.map((option, optionIndex) =>
-            <>
+            <React.Fragment key={optionIndex}>
               {chunkIndex === 0 && optionIndex === 0 &&
-                <Checkbox option={{
+                <Checkbox
+                  option={{
                     label: 'Select All',
                     value: 'all'
                   }}
@@ -127,12 +128,11 @@ export const MultiCheck: FC<Props> = (props: Props) => {
                 />
               }
               <Checkbox
-                key={option.value}
                 option={option}
                 checked={lodash.includes(selectedValues, option.value)}
                 onChange={handleChange(option)}
               />
-            </>
+            </React.Fragment>
           )}
         </div>
       )}
