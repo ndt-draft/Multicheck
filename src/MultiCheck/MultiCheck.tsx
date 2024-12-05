@@ -70,7 +70,21 @@ export const MultiCheck: FC<Props> = (props: Props) => {
     }
   }
 
+  function handleSelectAll(e: React.ChangeEvent<HTMLInputElement>): void {
+    if (typeof onChange === 'function') {
+      setSelectedValues(e.target.checked ? lodash.map(options, 'value') : [])
+      onChange(e.target.checked ? options: [])
+    }
+  }
+
   return <div className='MultiCheck'>
+    <Checkbox option={{
+        label: 'Select All',
+        value: 'all'
+      }}
+      checked={options.length === selectedValues?.length}
+      onChange={handleSelectAll}
+    />
     {options.map(option =>
       <Checkbox
         key={option.value}
