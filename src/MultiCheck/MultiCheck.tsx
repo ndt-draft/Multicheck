@@ -10,6 +10,20 @@ export type Option = {
   value: string
 }
 
+export function makeOptionChunks(options: Option[], columns: number): Option[][] {
+  const chunks: Option[][] = []
+
+  options.forEach((opt, index) => {
+    const chunkIndex = index % columns;
+    if (!chunks[chunkIndex]) {
+      chunks[chunkIndex] = []
+    }
+    chunks[chunkIndex].push(opt);
+  });
+
+  return chunks
+}
+
 /**
  * Notice:
  * 1. There should be a special `Select All` option with checkbox to control all passing options
@@ -39,7 +53,7 @@ type Props = {
 
 export const MultiCheck: FC<Props> = (props: Props) => {
   console.log('props', props)
-  const {options, values, onChange} = props
+  const {options, values, columns, onChange} = props
 
   // handle it own selected values state
   // caused by requirement **Don't modify the code of the 'Controller'**
@@ -87,20 +101,28 @@ export const MultiCheck: FC<Props> = (props: Props) => {
   }
 
   return <div className='MultiCheck'>
-    <Checkbox option={{
-        label: 'Select All',
-        value: 'all'
-      }}
-      checked={options.length === selectedValues?.length}
-      onChange={handleSelectAll}
-    />
-    {options.map(option =>
-      <Checkbox
-        key={option.value}
-        option={option}
-        checked={lodash.includes(selectedValues, option.value)}
-        onChange={handleChange(option)}
-      />
+    {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) =>
+      <div key={chunkIndex} className="MultiCheck-column">
+        {chunk.map((option, optionIndex) =>
+          <>
+            {chunkIndex === 0 && optionIndex === 0 &&
+              <Checkbox option={{
+                  label: 'Select All',
+                  value: 'all'
+                }}
+                checked={options.length === selectedValues?.length}
+                onChange={handleSelectAll}
+              />
+            }
+            <Checkbox
+              key={option.value}
+              option={option}
+              checked={lodash.includes(selectedValues, option.value)}
+              onChange={handleChange(option)}
+            />
+          </>
+        )}
+      </div>
     )}
   </div>
 }
