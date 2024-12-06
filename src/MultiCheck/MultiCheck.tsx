@@ -15,7 +15,7 @@ export function makeOptionChunks(options: Option[], columns: number): Option[][]
 
   // determine chunk size
   options.forEach((opt, index) => {
-    const chunkIndex = index % columns;
+    const chunkIndex = columns > 0 ? index % columns : 0;
     if (!chunks[chunkIndex]) {
       chunks[chunkIndex] = []
     }
