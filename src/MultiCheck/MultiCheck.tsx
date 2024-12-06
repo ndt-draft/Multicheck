@@ -111,7 +111,7 @@ export const MultiCheck: FC<Props> = (props: Props) => {
   }
 
   return <div className='MultiCheck'>
-    <span role="heading">{label}</span>
+    <div className="MultiCheck-heading" role="heading">{label}</div>
     <div className="MultiCheck-options">
       {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) =>
         <div key={chunkIndex} role="list" className="MultiCheck-column">
