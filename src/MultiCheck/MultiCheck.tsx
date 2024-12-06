@@ -70,41 +70,42 @@ export const MultiCheck: FC<Props> = (props: Props) => {
 
   // reset selected values when Values count is modified by controller
   useEffect(() => {
+    const checkedOptions = lodash.filter(options, opt => lodash.includes(values, opt.value))
+    setSelectedValues(lodash.map(checkedOptions, 'value'))
     if (typeof onChange === 'function') {
-      const checkedOptions = lodash.filter(options, opt => lodash.includes(values, opt.value))
-      setSelectedValues(lodash.map(checkedOptions, 'value'))
       onChange(checkedOptions)
     }
   }, [values])
 
    // reset selected values when Options count is modified by controller
    useEffect(() => {
+    const checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
+    setSelectedValues(lodash.map(checkedOptions, 'value'))
     if (typeof onChange === 'function') {
-      const checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
-      setSelectedValues(lodash.map(checkedOptions, 'value'))
       onChange(checkedOptions)
     }
   }, [options])
 
   function handleChange(option: Option): (e: React.ChangeEvent<HTMLInputElement>) => void {
     return (e: React.ChangeEvent<HTMLInputElement>): void => {
-      if (typeof onChange === 'function') {
-        let checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
+      let checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
 
-        if (e.target.checked) {
-          checkedOptions = [...checkedOptions, option]
-        } else {
-          checkedOptions = lodash.filter(checkedOptions, opt => opt.value !== option.value)
-        }
-        setSelectedValues(lodash.map(checkedOptions, 'value'))
+      if (e.target.checked) {
+        checkedOptions = [...checkedOptions, option]
+      } else {
+        checkedOptions = lodash.filter(checkedOptions, opt => opt.value !== option.value)
+      }
+      setSelectedValues(lodash.map(checkedOptions, 'value'))
+
+      if (typeof onChange === 'function') {
         onChange(checkedOptions)
       }
     }
   }
 
   function handleSelectAll(e: React.ChangeEvent<HTMLInputElement>): void {
+    setSelectedValues(e.target.checked ? lodash.map(options, 'value') : [])
     if (typeof onChange === 'function') {
-      setSelectedValues(e.target.checked ? lodash.map(options, 'value') : [])
       onChange(e.target.checked ? options: [])
     }
   }
