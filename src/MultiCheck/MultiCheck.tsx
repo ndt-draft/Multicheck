@@ -1,30 +1,33 @@
-import './MultiCheck.css';
+import './MultiCheck.css'
 
-import React, { useEffect, useState } from 'react';
-import {FC} from 'react';
+import React, { useEffect, useState } from 'react'
+import { FC } from 'react'
 import lodash from 'lodash'
-import Checkbox from './Checkbox';
+import Checkbox from './Checkbox'
 
 export type Option = {
-  label: string,
+  label: string
   value: string
 }
 
-export function makeOptionChunks(options: Option[], columns: number): Option[][] {
+export function makeOptionChunks(
+  options: Option[],
+  columns: number
+): Option[][] {
   const chunks: Option[][] = []
 
   // determine chunk size
   options.forEach((opt, index) => {
-    const chunkIndex = columns > 0 ? index % columns : 0;
+    const chunkIndex = columns > 0 ? index % columns : 0
     if (!chunks[chunkIndex]) {
       chunks[chunkIndex] = []
     }
-    chunks[chunkIndex].push(opt);
-  });
+    chunks[chunkIndex].push(opt)
+  })
 
   // reorder chunk items follow requirement
-  let start: number = 0;
-  let end: number = chunks?.[0]?.length;
+  let start: number = 0
+  let end: number = chunks?.[0]?.length
   return chunks.map((chunk, chunkIndex) => {
     if (chunkIndex !== 0) {
       start = end
@@ -41,15 +44,15 @@ export function makeOptionChunks(options: Option[], columns: number): Option[][]
  */
 type Props = {
   // the label text of the whole component
-  label?: string,
+  label?: string
   // Assume no duplicated labels or values
   // It may contain any values, so be careful for you "Select All" option
-  options: Option[],
+  options: Option[]
   // Always be non-negative integer.
   // The default value is 1
   // 0 is considered as 1
   // We only check [0, 1, 2, ... 10], but it should work for greater number
-  columns?: number,
+  columns?: number
   // Which options should be selected.
   // - If `undefined`, makes the component in uncontrolled mode with no default options checked, but the component is still workable;
   // - if not undefined, it's considered as the default value to render the component. And when it changes, it will be considered as the NEW default value to render the component again
@@ -58,11 +61,11 @@ type Props = {
   values?: string[]
   // if not undefined, when checked options are changed, they should be passed to outside
   // if undefined, the options can still be selected, but won't notify the outside
-  onChange?: (options: Option[]) => void,
+  onChange?: (options: Option[]) => void
 }
 
 export const MultiCheck: FC<Props> = (props: Props) => {
-  const {label, options, values, columns, onChange} = props
+  const { label, options, values, columns, onChange } = props
 
   // handle it own selected values state
   // caused by requirement **Don't modify the code of the 'Controller'**
@@ -70,30 +73,41 @@ export const MultiCheck: FC<Props> = (props: Props) => {
 
   // reset selected values when Values count is modified by controller
   useEffect(() => {
-    const checkedOptions = lodash.filter(options, opt => lodash.includes(values, opt.value))
+    const checkedOptions = lodash.filter(options, (opt) =>
+      lodash.includes(values, opt.value)
+    )
     setSelectedValues(lodash.map(checkedOptions, 'value'))
     if (typeof onChange === 'function') {
       onChange(checkedOptions)
     }
   }, [values])
 
-   // reset selected values when Options count is modified by controller
-   useEffect(() => {
-    const checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
+  // reset selected values when Options count is modified by controller
+  useEffect(() => {
+    const checkedOptions = lodash.filter(options, (opt) =>
+      lodash.includes(selectedValues, opt.value)
+    )
     setSelectedValues(lodash.map(checkedOptions, 'value'))
     if (typeof onChange === 'function') {
       onChange(checkedOptions)
     }
   }, [options])
 
-  function handleChange(option: Option): (e: React.ChangeEvent<HTMLInputElement>) => void {
+  function handleChange(
+    option: Option
+  ): (e: React.ChangeEvent<HTMLInputElement>) => void {
     return (e: React.ChangeEvent<HTMLInputElement>): void => {
-      let checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
+      let checkedOptions = lodash.filter(options, (opt) =>
+        lodash.includes(selectedValues, opt.value)
+      )
 
       if (e.target.checked) {
         checkedOptions = [...checkedOptions, option]
       } else {
-        checkedOptions = lodash.filter(checkedOptions, opt => opt.value !== option.value)
+        checkedOptions = lodash.filter(
+          checkedOptions,
+          (opt) => opt.value !== option.value
+        )
       }
       setSelectedValues(lodash.map(checkedOptions, 'value'))
 
@@ -106,36 +120,40 @@ export const MultiCheck: FC<Props> = (props: Props) => {
   function handleSelectAll(e: React.ChangeEvent<HTMLInputElement>): void {
     setSelectedValues(e.target.checked ? lodash.map(options, 'value') : [])
     if (typeof onChange === 'function') {
-      onChange(e.target.checked ? options: [])
+      onChange(e.target.checked ? options : [])
     }
   }
 
-  return <div className='MultiCheck'>
-    <div className="MultiCheck-heading" role="heading">{label}</div>
-    <div className="MultiCheck-options">
-      {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) =>
-        <div key={chunkIndex} role="list" className="MultiCheck-column">
-          {chunk.map((option, optionIndex) =>
-            <React.Fragment key={optionIndex}>
-              {chunkIndex === 0 && optionIndex === 0 &&
+  return (
+    <div className="MultiCheck">
+      <div className="MultiCheck-heading" role="heading">
+        {label}
+      </div>
+      <div className="MultiCheck-options">
+        {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) => (
+          <div key={chunkIndex} role="list" className="MultiCheck-column">
+            {chunk.map((option, optionIndex) => (
+              <React.Fragment key={optionIndex}>
+                {chunkIndex === 0 && optionIndex === 0 && (
+                  <Checkbox
+                    option={{
+                      label: 'Select All',
+                      value: 'all',
+                    }}
+                    checked={options.length === selectedValues?.length}
+                    onChange={handleSelectAll}
+                  />
+                )}
                 <Checkbox
-                  option={{
-                    label: 'Select All',
-                    value: 'all'
-                  }}
-                  checked={options.length === selectedValues?.length}
-                  onChange={handleSelectAll}
+                  option={option}
+                  checked={lodash.includes(selectedValues, option.value)}
+                  onChange={handleChange(option)}
                 />
-              }
-              <Checkbox
-                option={option}
-                checked={lodash.includes(selectedValues, option.value)}
-                onChange={handleChange(option)}
-              />
-            </React.Fragment>
-          )}
-        </div>
-      )}
+              </React.Fragment>
+            ))}
+          </div>
+        ))}
+      </div>
     </div>
-  </div>
+  )
 }
