@@ -1,6 +1,6 @@
 import './MultiCheck.css'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
 import { FC } from 'react'
 import lodash from 'lodash'
 import Checkbox from './Checkbox'
@@ -124,12 +124,23 @@ export const MultiCheck: FC<Props> = (props: Props) => {
     }
   }
 
-  function handleSelectAll(e: React.ChangeEvent<HTMLInputElement>): void {
-    setSelectedValues(e.target.checked ? lodash.map(options, 'value') : [])
-    if (typeof onChange === 'function') {
-      onChange(e.target.checked ? options : [])
-    }
-  }
+  const handleSelectAll = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      setSelectedValues(e.target.checked ? lodash.map(options, 'value') : [])
+      if (typeof onChange === 'function') {
+        onChange(e.target.checked ? options : [])
+      }
+    },
+    [options]
+  )
+
+  const allOptions: Option[][] = useMemo(
+    () =>
+      makeOptionChunks(options, columns || 1, [
+        { label: 'Select All', value: 'all' },
+      ]),
+    [options, columns]
+  )
 
   return (
     <div className="MultiCheck">
@@ -137,9 +148,7 @@ export const MultiCheck: FC<Props> = (props: Props) => {
         {label}
       </div>
       <div className="MultiCheck-options">
-        {makeOptionChunks(options, columns || 1, [
-          { label: 'Select All', value: 'all' },
-        ]).map((chunk, chunkIndex) => (
+        {allOptions.map((chunk, chunkIndex) => (
           <div key={chunkIndex} role="list" className="MultiCheck-column">
             {chunk.map((option) => (
               <Checkbox
