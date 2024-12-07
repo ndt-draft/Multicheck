@@ -5,7 +5,7 @@ import { Controller } from '../Controller'
 import { makeOptionChunks, Option, MultiCheck } from './MultiCheck'
 
 describe('MultiCheck', () => {
-  const options: Option[] = [
+  const allOptions: Option[] = [
     { label: 'aaa', value: '111' },
     { label: 'bbb', value: '222' },
     { label: 'ccc', value: '333' },
@@ -16,9 +16,9 @@ describe('MultiCheck', () => {
     { label: 'hhh', value: '888' },
     { label: 'iii', value: '999' },
   ]
-  const sixOptions: Option[] = options.slice(0, 6)
-  const sevenOptions: Option[] = options.slice(0, 7)
-  const eightOptions: Option[] = options.slice(0, 8)
+  const sixOptions: Option[] = allOptions.slice(0, 6)
+  const sevenOptions: Option[] = allOptions.slice(0, 7)
+  const eightOptions: Option[] = allOptions.slice(0, 8)
 
   const selectAllOption = {
     label: 'Select All',
@@ -26,7 +26,7 @@ describe('MultiCheck', () => {
   }
   const extraOptions = [selectAllOption]
 
-  const allValues = options.map((it) => it.value)
+  const allValues = allOptions.map((it) => it.value)
 
   describe('initialize', () => {
     it('renders the label if label provided', () => {
@@ -42,7 +42,9 @@ describe('MultiCheck', () => {
     })
 
     it('renders correct all selected values', () => {
-      render(<MultiCheck label="Status" options={options} values={allValues} />)
+      render(
+        <MultiCheck label="Status" options={allOptions} values={allValues} />
+      )
 
       screen.getAllByRole('checkbox').forEach((checkbox) => {
         expect(checkbox).toBeChecked()
@@ -53,7 +55,7 @@ describe('MultiCheck', () => {
       render(
         <MultiCheck
           label="Status"
-          options={options}
+          options={allOptions}
           values={['111', '222', '666']}
         />
       )
@@ -76,7 +78,11 @@ describe('MultiCheck', () => {
 
     it('renders options correctly if undefined values', () => {
       render(
-        <MultiCheck label="Status" options={options.slice(0, 2)} columns={2} />
+        <MultiCheck
+          label="Status"
+          options={allOptions.slice(0, 2)}
+          columns={2}
+        />
       )
 
       expect(screen.getByText('Select All')).toBeInTheDocument()
@@ -88,7 +94,7 @@ describe('MultiCheck', () => {
       render(
         <MultiCheck
           label="Status"
-          options={options.slice(0, 2)}
+          options={allOptions.slice(0, 2)}
           values={['111', '222']}
         />
       )
@@ -102,7 +108,7 @@ describe('MultiCheck', () => {
       render(
         <MultiCheck
           label="Status"
-          options={options.slice(0, 2)}
+          options={allOptions.slice(0, 2)}
           values={['111', '222', '333', '444']}
         />
       )
@@ -120,7 +126,7 @@ describe('MultiCheck', () => {
       render(
         <MultiCheck
           label="Status"
-          options={options}
+          options={allOptions}
           values={[]}
           onChange={onChange}
         />
@@ -134,14 +140,14 @@ describe('MultiCheck', () => {
 
   describe('uncontrolled mode', () => {
     it('handles click option correctly if undefined values and onChange', () => {
-      render(<MultiCheck label="Status" options={options} />)
+      render(<MultiCheck label="Status" options={allOptions} />)
       const firstOption = screen.getAllByRole('checkbox')[1]
       fireEvent.click(firstOption)
       expect(firstOption).toBeChecked()
     })
 
     it('handles click select all correctly if undefined values and onChange', () => {
-      render(<MultiCheck label="Status" options={options} />)
+      render(<MultiCheck label="Status" options={allOptions} />)
       const selectAll = screen.getAllByRole('checkbox')[0]
       fireEvent.click(selectAll)
       screen.getAllByRole('checkbox').forEach((checkbox) => {
@@ -152,22 +158,22 @@ describe('MultiCheck', () => {
 
   describe('columns', () => {
     it('handles columns is 0 as 1', () => {
-      render(<MultiCheck label="Status" options={options} columns={0} />)
+      render(<MultiCheck label="Status" options={allOptions} columns={0} />)
       expect(screen.getAllByRole('list')).toHaveLength(1)
     })
 
     it('handles columns is 1', () => {
-      render(<MultiCheck label="Status" options={options} columns={1} />)
+      render(<MultiCheck label="Status" options={allOptions} columns={1} />)
       expect(screen.getAllByRole('list')).toHaveLength(1)
     })
 
     it('handles changing columns dynamically', () => {
       const { rerender } = render(
-        <MultiCheck label="Status" options={options} columns={2} />
+        <MultiCheck label="Status" options={allOptions} columns={2} />
       )
       expect(screen.getAllByRole('list')).toHaveLength(2)
 
-      rerender(<MultiCheck label="Status" options={options} columns={3} />)
+      rerender(<MultiCheck label="Status" options={allOptions} columns={3} />)
       expect(screen.getAllByRole('list')).toHaveLength(3)
     })
 
@@ -220,7 +226,7 @@ describe('MultiCheck', () => {
     })
 
     it('distributes 9 options evenly in 2 columns', () => {
-      render(<MultiCheck label="Status" options={options} columns={2} />)
+      render(<MultiCheck label="Status" options={allOptions} columns={2} />)
 
       const columns = screen.getAllByRole('list')
       expect(within(columns[0]).getByText('Select All')).toBeInTheDocument()
@@ -241,10 +247,10 @@ describe('MultiCheck', () => {
     it('unselect/select all and click some checkboxes', () => {
       render(
         <Controller
-          render={(options, values, columns, onChange) => (
+          render={(allOptions, values, columns, onChange) => (
             <MultiCheck
               label="MultiCheck"
-              options={options}
+              options={allOptions}
               onChange={onChange}
               values={values}
               columns={columns}
@@ -288,22 +294,22 @@ describe('MultiCheck', () => {
     })
 
     it('should return all options in a single chunk when columns is 0', () => {
-      expect(makeOptionChunks(options, 0)).toStrictEqual([options])
+      expect(makeOptionChunks(allOptions, 0)).toStrictEqual([allOptions])
     })
 
     it('should return extra options and all options in a single chunk when columns is 0', () => {
-      expect(makeOptionChunks(options, 0, extraOptions)).toStrictEqual([
-        [...extraOptions, ...options],
+      expect(makeOptionChunks(allOptions, 0, extraOptions)).toStrictEqual([
+        [...extraOptions, ...allOptions],
       ])
     })
 
     it('should return all options in a single chunk when columns is 1', () => {
-      expect(makeOptionChunks(options, 1)).toStrictEqual([options])
+      expect(makeOptionChunks(allOptions, 1)).toStrictEqual([allOptions])
     })
 
     it('should return extra options and all options in a single chunk when columns is 1', () => {
-      expect(makeOptionChunks(options, 1, extraOptions)).toStrictEqual([
-        [...extraOptions, ...options],
+      expect(makeOptionChunks(allOptions, 1, extraOptions)).toStrictEqual([
+        [...extraOptions, ...allOptions],
       ])
     })
 
@@ -371,7 +377,7 @@ describe('MultiCheck', () => {
           { label: 'hhh', value: '888' },
         ],
       ])
-      expect(makeOptionChunks(options, 3)).toStrictEqual([
+      expect(makeOptionChunks(allOptions, 3)).toStrictEqual([
         [
           { label: 'aaa', value: '111' },
           { label: 'bbb', value: '222' },
@@ -439,7 +445,7 @@ describe('MultiCheck', () => {
           { label: 'hhh', value: '888' },
         ],
       ])
-      expect(makeOptionChunks(options, 2, extraOptions)).toStrictEqual([
+      expect(makeOptionChunks(allOptions, 2, extraOptions)).toStrictEqual([
         [
           selectAllOption,
           { label: 'aaa', value: '111' },
