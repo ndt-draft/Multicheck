@@ -42,9 +42,7 @@ describe('MultiCheck', () => {
     })
 
     it('renders correct all selected values', () => {
-      render(
-        <MultiCheck label="Status" options={options} values={allValues} />
-      )
+      render(<MultiCheck label="Status" options={options} values={allValues} />)
 
       screen.getAllByRole('checkbox').forEach((checkbox) => {
         expect(checkbox).toBeChecked()
@@ -78,11 +76,7 @@ describe('MultiCheck', () => {
 
     it('renders options correctly if undefined values', () => {
       render(
-        <MultiCheck
-          label="Status"
-          options={options.slice(0, 2)}
-          columns={2}
-        />
+        <MultiCheck label="Status" options={options.slice(0, 2)} columns={2} />
       )
 
       expect(screen.getByText('Select All')).toBeInTheDocument()
@@ -199,7 +193,7 @@ describe('MultiCheck', () => {
       expect(within(columns[0]).getByText('Select All')).toBeInTheDocument()
       expect(within(columns[0]).getByText('aaa')).toBeInTheDocument()
       expect(within(columns[0]).getByText('bbb')).toBeInTheDocument()
-      
+
       expect(within(columns[1]).getByText('ccc')).toBeInTheDocument()
       expect(within(columns[1]).getByText('ddd')).toBeInTheDocument()
       expect(within(columns[1]).getByText('eee')).toBeInTheDocument()
@@ -215,7 +209,7 @@ describe('MultiCheck', () => {
       expect(within(columns[0]).getByText('Select All')).toBeInTheDocument()
       expect(within(columns[0]).getByText('aaa')).toBeInTheDocument()
       expect(within(columns[0]).getByText('bbb')).toBeInTheDocument()
-      
+
       expect(within(columns[1]).getByText('ccc')).toBeInTheDocument()
       expect(within(columns[1]).getByText('ddd')).toBeInTheDocument()
       expect(within(columns[1]).getByText('eee')).toBeInTheDocument()
@@ -285,8 +279,12 @@ describe('MultiCheck', () => {
     })
 
     it('should return extra options in a single chunk if empty options and extra options provided', () => {
-      expect(makeOptionChunks([], 3, extraOptions)).toStrictEqual([extraOptions])
-      expect(makeOptionChunks([], 0, extraOptions)).toStrictEqual([extraOptions])
+      expect(makeOptionChunks([], 3, extraOptions)).toStrictEqual([
+        extraOptions,
+      ])
+      expect(makeOptionChunks([], 0, extraOptions)).toStrictEqual([
+        extraOptions,
+      ])
     })
 
     it('should return all options in a single chunk when columns is 0', () => {
@@ -294,7 +292,9 @@ describe('MultiCheck', () => {
     })
 
     it('should return extra options and all options in a single chunk when columns is 0', () => {
-      expect(makeOptionChunks(options, 0, extraOptions)).toStrictEqual([[...extraOptions, ...options]])
+      expect(makeOptionChunks(options, 0, extraOptions)).toStrictEqual([
+        [...extraOptions, ...options],
+      ])
     })
 
     it('should return all options in a single chunk when columns is 1', () => {
@@ -302,7 +302,9 @@ describe('MultiCheck', () => {
     })
 
     it('should return extra options and all options in a single chunk when columns is 1', () => {
-      expect(makeOptionChunks(options, 1, extraOptions)).toStrictEqual([[...extraOptions, ...options]])
+      expect(makeOptionChunks(options, 1, extraOptions)).toStrictEqual([
+        [...extraOptions, ...options],
+      ])
     })
 
     it('should return each option as a separate chunk when columns exceed the number of options', () => {

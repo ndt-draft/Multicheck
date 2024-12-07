@@ -13,7 +13,7 @@ export type Option = {
 export function makeOptionChunks(
   options: Option[],
   columns: number,
-  extraOptions: Option[] = [],
+  extraOptions: Option[] = []
 ): Option[][] {
   const chunks: Option[][] = []
   const allOptions = [...extraOptions, ...options]
@@ -137,13 +137,19 @@ export const MultiCheck: FC<Props> = (props: Props) => {
         {label}
       </div>
       <div className="MultiCheck-options">
-        {makeOptionChunks(options, columns || 1, [{label: 'Select All', value: 'all'}]).map((chunk, chunkIndex) => (
+        {makeOptionChunks(options, columns || 1, [
+          { label: 'Select All', value: 'all' },
+        ]).map((chunk, chunkIndex) => (
           <div key={chunkIndex} role="list" className="MultiCheck-column">
             {chunk.map((option) => (
               <Checkbox
                 key={option.value}
                 option={option}
-                checked={option.value === 'all' ? options.length === selectedValues?.length : lodash.includes(selectedValues, option.value)}
+                checked={
+                  option.value === 'all'
+                    ? options.length === selectedValues?.length
+                    : lodash.includes(selectedValues, option.value)
+                }
                 onChange={handleChange(option)}
               />
             ))}
