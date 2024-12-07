@@ -12,12 +12,14 @@ export type Option = {
 
 export function makeOptionChunks(
   options: Option[],
-  columns: number
+  columns: number,
+  extraOptions: Option[] = [],
 ): Option[][] {
   const chunks: Option[][] = []
+  const allOptions = [...extraOptions, ...options]
 
   // determine chunk size
-  options.forEach((opt, index) => {
+  allOptions.forEach((opt, index) => {
     const chunkIndex = columns > 0 ? index % columns : 0
     if (!chunks[chunkIndex]) {
       chunks[chunkIndex] = []
@@ -33,7 +35,7 @@ export function makeOptionChunks(
       start = end
       end += chunk?.length
     }
-    return options.slice(start, end)
+    return allOptions.slice(start, end)
   })
 }
 
@@ -97,6 +99,11 @@ export const MultiCheck: FC<Props> = (props: Props) => {
     option: Option
   ): (e: React.ChangeEvent<HTMLInputElement>) => void {
     return (e: React.ChangeEvent<HTMLInputElement>): void => {
+      if (e.target.value === 'all') {
+        handleSelectAll(e)
+        return
+      }
+
       let checkedOptions = lodash.filter(options, (opt) =>
         lodash.includes(selectedValues, opt.value)
       )
@@ -130,26 +137,15 @@ export const MultiCheck: FC<Props> = (props: Props) => {
         {label}
       </div>
       <div className="MultiCheck-options">
-        {makeOptionChunks(options, columns || 1).map((chunk, chunkIndex) => (
+        {makeOptionChunks(options, columns || 1, [{label: 'Select All', value: 'all'}]).map((chunk, chunkIndex) => (
           <div key={chunkIndex} role="list" className="MultiCheck-column">
-            {chunk.map((option, optionIndex) => (
-              <React.Fragment key={optionIndex}>
-                {chunkIndex === 0 && optionIndex === 0 && (
-                  <Checkbox
-                    option={{
-                      label: 'Select All',
-                      value: 'all',
-                    }}
-                    checked={options.length === selectedValues?.length}
-                    onChange={handleSelectAll}
-                  />
-                )}
-                <Checkbox
-                  option={option}
-                  checked={lodash.includes(selectedValues, option.value)}
-                  onChange={handleChange(option)}
-                />
-              </React.Fragment>
+            {chunk.map((option) => (
+              <Checkbox
+                key={option.value}
+                option={option}
+                checked={option.value === 'all' ? options.length === selectedValues?.length : lodash.includes(selectedValues, option.value)}
+                onChange={handleChange(option)}
+              />
             ))}
           </div>
         ))}
