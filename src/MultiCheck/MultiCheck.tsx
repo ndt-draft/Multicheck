@@ -123,7 +123,7 @@ export const MultiCheck: FC<Props> = (props: Props) => {
     [options]
   )
 
-  const allOptions: Option[][] = useMemo(
+  const optionChunks: Option[][] = useMemo(
     () =>
       makeOptionChunks(options, columns || 1, [
         { label: 'Select All', value: 'all' },
@@ -137,7 +137,7 @@ export const MultiCheck: FC<Props> = (props: Props) => {
         {label}
       </div>
       <div className="MultiCheck-options">
-        {allOptions.map((chunk, chunkIndex) => (
+        {optionChunks.map((chunk, chunkIndex) => (
           <div key={chunkIndex} role="list" className="MultiCheck-column">
             {chunk.map((option) => (
               <Checkbox
