@@ -1,3 +1,30 @@
 /* TODO */
+:root {
+  --heading-bg-color: #eaeaea;
+  --heading-color: #222;
+  --border-color: #ddd;
+}
+
 .MultiCheck {
+  font-family: system-ui, sans-serif;
+
+  .MultiCheck-heading {
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 1.5em;
+    color: var(--heading-color);
+    background-color: var(--heading-bg-color);
+  }
+
+  .MultiCheck-options {
+    display: flex;
+    max-width: fit-content;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+  }
+
+  .MultiCheck-column {
+    margin-right: 16px;
+  }
 }

@@ -1,13 +1,42 @@
-import './MultiCheck.css';
+import './MultiCheck.css'
 
-import React, { useEffect, useState } from 'react';
-import {FC} from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import { FC } from 'react'
 import lodash from 'lodash'
-import Checkbox from './Checkbox';
+import Checkbox from './Checkbox'
 
 export type Option = {
-  label: string,
+  label: string
   value: string
+}
+
+export function makeOptionChunks(
+  options: Option[],
+  columns: number,
+  extraOptions: Option[] = []
+): Option[][] {
+  const chunks: Option[][] = []
+  const allOptions = [...extraOptions, ...options]
+
+  // determine chunk size
+  allOptions.forEach((opt, index) => {
+    const chunkIndex = columns > 0 ? index % columns : 0
+    if (!chunks[chunkIndex]) {
+      chunks[chunkIndex] = []
+    }
+    chunks[chunkIndex].push(opt)
+  })
+
+  // reorder chunk items follow requirement
+  let start: number = 0
+  let end: number = chunks?.[0]?.length
+  return chunks.map((chunk, chunkIndex) => {
+    if (chunkIndex !== 0) {
+      start = end
+      end += chunk?.length
+    }
+    return allOptions.slice(start, end)
+  })
 }
 
 /**
@@ -17,15 +46,15 @@ export type Option = {
  */
 type Props = {
   // the label text of the whole component
-  label?: string,
+  label?: string
   // Assume no duplicated labels or values
   // It may contain any values, so be careful for you "Select All" option
-  options: Option[],
+  options: Option[]
   // Always be non-negative integer.
   // The default value is 1
   // 0 is considered as 1
   // We only check [0, 1, 2, ... 10], but it should work for greater number
-  columns?: number,
+  columns?: number
   // Which options should be selected.
   // - If `undefined`, makes the component in uncontrolled mode with no default options checked, but the component is still workable;
   // - if not undefined, it's considered as the default value to render the component. And when it changes, it will be considered as the NEW default value to render the component again
@@ -34,50 +63,97 @@ type Props = {
   values?: string[]
   // if not undefined, when checked options are changed, they should be passed to outside
   // if undefined, the options can still be selected, but won't notify the outside
-  onChange?: (options: Option[]) => void,
+  onChange?: (options: Option[]) => void
 }
 
 export const MultiCheck: FC<Props> = (props: Props) => {
-  console.log('props', props)
-  const {options, values, onChange} = props
+  const { label, options, values, columns, onChange } = props
 
   // handle it own selected values state
   // caused by requirement **Don't modify the code of the 'Controller'**
   const [selectedValues, setSelectedValues] = useState(values)
 
-  // reset selected values when Values count is modified by controller
+  // reset selected values when options/values props is modified by controller
   useEffect(() => {
-    setSelectedValues(values)
+    const checkedOptions = lodash.filter(options, (opt) =>
+      lodash.includes(values, opt.value)
+    )
+    setSelectedValues(lodash.map(checkedOptions, 'value'))
     if (typeof onChange === 'function') {
-      const checkedOptions = lodash.filter(options, opt => lodash.includes(values, opt.value))
       onChange(checkedOptions)
     }
-  }, [values])
+  }, [options, values])
 
-  function handleChange(option: Option): (e: React.ChangeEvent<HTMLInputElement>) => void {
+  function handleChange(
+    option: Option
+  ): (e: React.ChangeEvent<HTMLInputElement>) => void {
     return (e: React.ChangeEvent<HTMLInputElement>): void => {
-      if (typeof onChange === 'function') {
-        let checkedOptions = lodash.filter(options, opt => lodash.includes(selectedValues, opt.value))
+      if (e.target.value === 'all') {
+        handleSelectAll(e)
+        return
+      }
 
-        if (e.target.checked) {
-          checkedOptions = [...checkedOptions, option]
-        } else {
-          checkedOptions = lodash.filter(checkedOptions, opt => opt.value !== option.value)
-        }
-        setSelectedValues(lodash.map(checkedOptions, 'value'))
+      let checkedOptions = lodash.filter(options, (opt) =>
+        lodash.includes(selectedValues, opt.value)
+      )
+
+      if (e.target.checked) {
+        checkedOptions = [...checkedOptions, option]
+      } else {
+        checkedOptions = lodash.filter(
+          checkedOptions,
+          (opt) => opt.value !== option.value
+        )
+      }
+      setSelectedValues(lodash.map(checkedOptions, 'value'))
+
+      if (typeof onChange === 'function') {
         onChange(checkedOptions)
       }
     }
   }
 
-  return <div className='MultiCheck'>
-    {options.map(option =>
-      <Checkbox
-        key={option.value}
-        option={option}
-        checked={lodash.includes(selectedValues, option.value)}
-        onChange={handleChange(option)}
-      />
-    )}
-  </div>
+  const handleSelectAll = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>): void => {
+      setSelectedValues(e.target.checked ? lodash.map(options, 'value') : [])
+      if (typeof onChange === 'function') {
+        onChange(e.target.checked ? options : [])
+      }
+    },
+    [options]
+  )
+
+  const optionChunks: Option[][] = useMemo(
+    () =>
+      makeOptionChunks(options, columns || 1, [
+        { label: 'Select All', value: 'all' },
+      ]),
+    [options, columns]
+  )
+
+  return (
+    <div className="MultiCheck">
+      <div className="MultiCheck-heading" role="heading">
+        {label}
+      </div>
+      <div className="MultiCheck-options">
+        {optionChunks.map((chunk, chunkIndex) => (
+          <div key={chunkIndex} role="list" className="MultiCheck-column">
+            {chunk.map((option) => (
+              <Checkbox
+                key={option.value}
+                option={option}
+                checked={
+                  option.value === 'all'
+                    ? options.length === selectedValues?.length
+                    : lodash.includes(selectedValues, option.value)
+                }
+                onChange={handleChange(option)}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 }
